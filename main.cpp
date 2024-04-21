@@ -16,6 +16,11 @@ private:
 public:
     LinkedList() : head(nullptr), tail(nullptr) {}
 
+    ~LinkedList() {
+        while (head)
+            head = std::move(head->next);
+    }
+
     void push_front(const T& data)
     {
         auto newNode = std::make_unique<Node>(data);
@@ -73,32 +78,32 @@ public:
 
     void pop_front()
     {
-        if (head)
-        {
-            head = std::move(head->next);
-            if (!head)
-                tail = nullptr;
-        }
+        if (!head)
+            return;
+
+        head = std::move(head->next);
+        if (!head)
+            tail = nullptr;
     }
 
     void pop_back()
     {
-        if (head)
-        {
-            if (head.get() == tail)
-            {
-                head = nullptr;
-                tail = nullptr;
-            }
-            else
-            {
-                auto current = head.get();
-                while (current->next.get() != tail)
-                    current = current->next.get();
+        if (!head)
+            return;
 
-                current->next = nullptr;
-                tail = current;
-            }
+        if (head.get() == tail)
+        {
+            head = nullptr;
+            tail = nullptr;
+        }
+        else
+        {
+            auto current = head.get();
+            while (current->next.get() != tail)
+                current = current->next.get();
+
+            current->next = nullptr;
+            tail = current;
         }
     }
 
@@ -218,3 +223,9 @@ public:
     }
 };
 
+int main(){
+    LinkedList<int> list;
+
+    list.push_back(3);
+    list.~LinkedList();
+}
