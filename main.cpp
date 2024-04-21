@@ -3,41 +3,47 @@
 #include <vector>
 
 template <typename T>
-class LinkedList {
+class LinkedList{
 private:
     struct Node {
         T data;
         std::unique_ptr<Node> next;
         explicit Node(const T& data) : data(data), next(nullptr) {}
     };
-
     std::unique_ptr<Node> head;
     Node* tail;
 
 public:
     LinkedList() : head(nullptr), tail(nullptr) {}
 
-    void push_front(const T& data) {
+    void push_front(const T& data)
+    {
         auto newNode = std::make_unique<Node>(data);
         newNode->next = std::move(head);
         head = std::move(newNode);
-        if (!tail) tail = head.get();
+        if (!tail)
+            tail = head.get();
     }
 
-    void push_back(const T& data) {
+    void push_back(const T& data)
+    {
         auto newNode = std::make_unique<Node>(data);
-        if (tail) {
+        if (tail)
+        {
             tail->next = std::move(newNode);
             tail = tail->next.get();
         }
-        else {
+        else
+        {
             head = std::move(newNode);
             tail = head.get();
         }
     }
 
-    void insert(int index, const T& data) {
-        if (index == 0) {
+    void insert(int index, const T& data)
+    {
+        if (index == 0)
+        {
             push_front(data);
             return;
         }
@@ -45,123 +51,166 @@ public:
         auto current = head.get();
         int currentIndex = 0;
 
-        while (current && currentIndex < index - 1) {
+        while (current && currentIndex < index - 1)
+        {
             current = current->next.get();
             currentIndex++;
         }
 
-        if (current) {
+        if (current)
+        {
             auto newNode = std::make_unique<Node>(data);
-            if (!newNode->next)
-                tail = newNode.get();
             newNode->next = std::move(current->next);
             current->next = std::move(newNode);
+            if (!newNode->next)
+                tail = newNode.get();
         }
-        else {
+        else
+        {
             throw std::out_of_range("Index out of range");
         }
     }
 
-    void pop_front() {
-        if (head) {
+    void pop_front()
+    {
+        if (head)
+        {
             head = std::move(head->next);
-            if (!head) tail = nullptr;
+            if (!head)
+                tail = nullptr;
         }
     }
 
-    void pop_back() {
-        if (head) {
-            if (head.get() == tail) {
+    void pop_back()
+    {
+        if (head)
+        {
+            if (head.get() == tail)
+            {
                 head = nullptr;
                 tail = nullptr;
-            } else {
+            }
+            else
+            {
                 auto current = head.get();
-                while (current->next.get() != tail) {
+                while (current->next.get() != tail)
                     current = current->next.get();
-                }
+
                 current->next = nullptr;
                 tail = current;
             }
         }
     }
 
-    void remove(const T& data) {
+    void remove(const T& data)
+    {
+        if (!head)
+            return;
+
         auto current = head.get();
         Node* previous = nullptr;
-        while (current && current->data != data) {
+
+        while (current && current->data != data)
+        {
             previous = current;
             current = current->next.get();
         }
-        if (current) {
-            if (previous) {
+
+        if (current)
+        {
+            if (previous)
+            {
                 previous->next = std::move(current->next);
-                if (!previous->next) tail = previous;
-            } else {
+                if (!previous->next)
+                    tail = previous;
+            }
+            else
+            {
                 head = std::move(current->next);
-                if (!head) tail = nullptr;
+                if (!head)
+                    tail = nullptr;
             }
         }
     }
 
-    void removeAll(const T& data) {
-        while (head && head->data == data) {
-            head = std::move(head->next);
-        }
-
-        if (!head) {
-            tail = nullptr;
+    void removeAll(const T& data)
+    {
+        if (!head)
             return;
-        }
+
+        while (head && head->data == data)
+            head = std::move(head->next);
 
         auto current = head.get();
-        while (current->next) {
-            if (current->next->data == data) {
+        while (current->next)
+        {
+            if (current->next->data == data)
+            {
                 current->next = std::move(current->next->next);
-            } else {
-                current = current->next.get();
             }
+            else
+                current = current->next.get();
         }
 
-        if (current->data == data) {
+        if (current->data == data)
+        {
             tail = current;
             tail->next = nullptr;
-        } else {
-            tail = current;
         }
+        else
+            tail = current;
     }
 
-    std::vector<int> findAll(const T& data) {
+    std::vector<int> findAll(const T& data)
+    {
         std::vector<int> indices;
+        if (!head)
+            return indices;
+
         auto current = head.get();
         int currentIndex = 0;
-        while (current) {
-            if (current->data == data) {
+
+        while (current)
+        {
+            if (current->data == data)
                 indices.push_back(currentIndex);
-            }
+
             current = current->next.get();
             currentIndex++;
         }
         return indices;
     }
 
-    Node* find(const T& data) {
+    Node* find(const T& data)
+    {
+        if (!head)
+            return nullptr;
+
         auto current = head.get();
-        while (current) {
-            if (current->data == data) {
+
+        while (current)
+        {
+            if (current->data == data)
                 return current;
-            }
+
             current = current->next.get();
         }
         return nullptr;
     }
 
-    bool empty() const {
+    bool empty() const
+    {
         return head == nullptr;
     }
 
-    void print() const {
+    void print() const
+    {
+        if (!head)
+            return;
+
         auto current = head.get();
-        while (current) {
+        while (current)
+        {
             std::cout << current->data << " ";
             current = current->next.get();
         }
@@ -169,44 +218,3 @@ public:
     }
 };
 
-int main() {
-    LinkedList<int> list;
-
-    list.push_back(2);
-    list.push_front(1);
-    list.push_back(4);
-    list.push_back(5);
-    list.push_back(6);
-    list.push_back(7);
-    list.push_back(8);
-    list.push_back(9);
-    list.push_back(7);
-    list.push_back(8);
-    list.push_back(7);
-    list.insert(2, 3);
-    list.insert(10, 7);
-    list.insert(11, 9);
-
-    std::cout << "Список: ";
-    list.print();
-
-    list.remove(8);
-    list.removeAll(9);
-    list.pop_back();
-    list.pop_front();
-
-    std::cout << "Список после удаления 8 и 9: ";
-    list.print();
-
-    auto elem = list.find(3);
-    std::cout << elem->data << std::endl;
-
-    auto indices = list.findAll(7);
-    std::cout << "Индексы элемента 7: ";
-    for (int index : indices) {
-        std::cout << index << " ";
-    }
-    std::cout << std::endl;
-
-    return 0;
-}
