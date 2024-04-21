@@ -222,10 +222,3 @@ public:
         std::cout << std::endl;
     }
 };
-
-int main(){
-    LinkedList<int> list;
-
-    list.push_back(3);
-    list.~LinkedList();
-}
